@@ -12,6 +12,7 @@ module.exports = {
         FileWatcher: 'src/file-watcher.js',
         ConverterFactory: 'src/converter-factory.js',
         Converter: 'src/converter.js',
+        MenuTemplate: 'src/menu-template.js',
       },
     },
   },

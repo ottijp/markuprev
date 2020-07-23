@@ -1,7 +1,8 @@
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, Menu } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import path from 'path'
+import menuTemplate from './menu-template'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -80,6 +81,9 @@ app.on('ready', async () => {
   protocol.registerFileProtocol('tron', (request, callback) => {
     callback({ path: path.normalize(decodeURIComponent(request.url.substr(6))) })
   })
+
+  const menu = Menu.buildFromTemplate(menuTemplate)
+  Menu.setApplicationMenu(menu)
 
   createWindow()
 })
