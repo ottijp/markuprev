@@ -14,6 +14,17 @@ module.exports = {
         Converter: 'src/converter.js',
         MenuTemplate: 'src/menu-template.js',
       },
+      builderOptions: {
+        appId: 'biz.sakao.markuprev',
+        win: {
+          target: 'portable',
+          icon: 'src/assets/icon.png',
+        },
+        mac: {
+          target: 'dmg',
+          icon: 'src/assets/icon.png',
+        },
+      },
     },
   },
 }
