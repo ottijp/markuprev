@@ -6,10 +6,6 @@ import menuTemplate from './menu-template'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let win
-
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } },
@@ -17,7 +13,7 @@ protocol.registerSchemesAsPrivileged([
 
 function createWindow() {
   // Create the browser window.
-  win = new BrowserWindow({
+  const win = new BrowserWindow({
     width: 1024,
     height: 800,
     webPreferences: {
@@ -40,10 +36,6 @@ function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
-
-  win.on('closed', () => {
-    win = null
-  })
 }
 
 // Quit when all windows are closed.
@@ -58,7 +50,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (win === null) {
+  if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
   }
 })
@@ -82,7 +74,9 @@ app.on('ready', async () => {
     callback({ path: path.normalize(decodeURIComponent(request.url.substr(6))) })
   })
 
-  const menu = Menu.buildFromTemplate(menuTemplate)
+  const menu = Menu.buildFromTemplate(menuTemplate({
+    onNew: createWindow,
+  }))
   Menu.setApplicationMenu(menu)
 
   createWindow()
