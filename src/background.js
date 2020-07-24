@@ -2,16 +2,18 @@ import { app, protocol, BrowserWindow, Menu } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import path from 'path'
+import minimist from 'minimist'
 import menuTemplate from './menu-template'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
+const args = minimist(process.argv.slice(isDevelopment ? 2 : 1))
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } },
 ])
 
-function createWindow() {
+function createWindow(filePath) {
   // Create the browser window.
   const win = new BrowserWindow({
     width: 1024,
@@ -24,6 +26,7 @@ function createWindow() {
       contextIsolation: false,
       webviewTag: true,
       preload: path.join(__dirname, 'preload.js'),
+      additionalArguments: filePath ? [`--file=${filePath}`] : undefined,
     },
   })
 
@@ -37,6 +40,27 @@ function createWindow() {
     win.loadURL('app://./index.html')
   }
 }
+
+app.on('second-instance', (event, commandLine, workingDirectory) => {
+  const args2 = minimist(commandLine.slice(isDevelopment ? 2 : 1))
+  if (args2._.length > 0) {
+    // if has args, open files in args
+    args2._.forEach(filePath => {
+      createWindow(filePath)
+    })
+  } else {
+    // if has no args, create empty window or focus exising window
+    const wins = BrowserWindow.getAllWindows()
+    if (wins.length === 0) {
+      createWindow()
+    } else {
+      if (wins[0].isMinimized()) {
+        wins[0].restore()
+      }
+      wins[0].show()
+    }
+  }
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -59,6 +83,12 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
+  // terminate duplicate app instance
+  if (!app.requestSingleInstanceLock()) {
+    app.quit()
+    return
+  }
+
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
@@ -75,11 +105,20 @@ app.on('ready', async () => {
   })
 
   const menu = Menu.buildFromTemplate(menuTemplate({
-    onNew: createWindow,
+    onNew: () => createWindow(),
   }))
   Menu.setApplicationMenu(menu)
 
-  createWindow()
+  // create initial windows
+  if (args._.length > 0) {
+    // if has args, open files in args
+    args._.forEach(filePath => {
+      createWindow(filePath)
+    })
+  } else {
+    // if has no args, open empty window
+    createWindow()
+  }
 })
 
 // Exit cleanly on request from parent process in development mode.

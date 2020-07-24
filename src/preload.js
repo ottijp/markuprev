@@ -1,7 +1,10 @@
 import { remote } from 'electron'
 import path from 'path'
+import minimist from 'minimist'
 import BuilderApp from './builder-app'
 import FileWatcher from './file-watcher'
+
+const args = minimist(process.argv)
 
 process.once('loaded', () => {
   window.electron = {
@@ -9,6 +12,7 @@ process.once('loaded', () => {
     getCurrentWindow: remote.getCurrentWindow,
     BuilderApp,
     FileWatcher,
+    args,
   }
 })
 

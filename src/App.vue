@@ -60,6 +60,7 @@ const {
   getCurrentWindow,
   BuilderApp,
   FileWatcher,
+  args,
 } = window.electron
 
 export default {
@@ -102,6 +103,10 @@ export default {
     //   const filePath = e.dataTransfer.files[0].path
     //   this.openFile(filePath)
     // })
+
+    if (args.file) {
+      this.openFile(args.file)
+    }
   },
 
   methods: {
