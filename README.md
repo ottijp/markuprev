@@ -11,7 +11,7 @@ MarkdownやAsciidocなどの軽量マークアップ言語のプレビューア�
     * macOS
     * Windows
 * ファイルタイプ
-    * .asoc
+    * .adoc
     * .md
 
 ## コンバータの準備
