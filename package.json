@@ -19,6 +19,7 @@
   "main": "background.js",
   "dependencies": {
     "minimist": "^1.2.5",
+    "node-html-parser": "^1.2.20",
     "sass": "^1.26.10",
     "sass-loader": "^9.0.2",
     "vue": "^2.6.11",

@@ -11,6 +11,10 @@ export default class FileWatcher {
     return path.basename(this.filePath)
   }
 
+  dirname() {
+    return path.dirname(this.filePath)
+  }
+
   fullName() {
     return this.filePath
   }

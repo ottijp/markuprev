@@ -128,9 +128,8 @@ export default {
 
       this.build = { status: 'ready' }
       this.builderApp = new BuilderApp(new FileWatcher(filePath))
-      this.builderApp.on('built', html => {
-        const blob = new Blob([html], { type: 'text/html' })
-        const url = URL.createObjectURL(blob)
+      this.builderApp.on('built', builtFile => {
+        const url = `file://${builtFile}`
         this.build = {
           status: 'built',
           url,
