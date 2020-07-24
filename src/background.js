@@ -1,4 +1,6 @@
-import { app, protocol, BrowserWindow, Menu } from 'electron'
+import {
+  app, protocol, BrowserWindow, Menu,
+} from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import path from 'path'
@@ -41,7 +43,7 @@ function createWindow(filePath) {
   }
 }
 
-app.on('second-instance', (event, commandLine, workingDirectory) => {
+app.on('second-instance', (event, commandLine) => {
   const args2 = minimist(commandLine.slice(isDevelopment ? 2 : 1))
   if (args2._.length > 0) {
     // if has args, open files in args
