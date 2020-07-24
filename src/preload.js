@@ -17,4 +17,7 @@ process.once('loaded', () => {
 })
 
 // set PATH env
-process.env.PATH = `${process.env.PATH}${path.delimiter}/usr/local/bin`
+const isMac = process.platform === 'darwin'
+if (isMac) {
+  process.env.PATH = `${process.env.PATH}${path.delimiter}/usr/local/bin`
+}
