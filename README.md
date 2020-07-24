@@ -9,7 +9,7 @@ MarkdownやAsciidocなどの軽量マークアップ言語のプレビューア�
 
 * プラットフォーム
     * macOS
-    * Windows(64bit)
+    * Windows
 * ファイルタイプ
     * .asoc
     * .md

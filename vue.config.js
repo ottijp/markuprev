@@ -17,7 +17,13 @@ module.exports = {
       builderOptions: {
         appId: 'biz.sakao.markuprev',
         win: {
-          target: 'portable',
+          target: {
+            target: 'portable',
+            arch: [
+              'x64',
+              'ia32',
+            ],
+          },
           icon: 'src/assets/icon.png',
         },
         mac: {
