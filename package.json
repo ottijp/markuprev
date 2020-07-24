@@ -1,6 +1,10 @@
 {
   "name": "MarkuPrev",
   "version": "0.1.0",
+  "description": "markup previewer",
+  "author": {
+    "name": "Satoshi SAKAO"
+  },
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
