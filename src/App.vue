@@ -141,7 +141,6 @@ export default {
         }
       })
       this.builderApp.on('failed', e => {
-        console.log('failed', e)
         this.build = {
           status: 'failed',
           errorMessage: e,
