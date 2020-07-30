@@ -195,7 +195,7 @@ export default {
 
     isSourcePage() {
       const previewContent = this.getPreviewContent()
-      return previewContent && previewContent.src.match(/^blob:http/) !== null
+      return previewContent && previewContent.src.match(/^file:\/\//) !== null
     },
 
     async webviewDidLoad() {
