@@ -13,6 +13,7 @@ process.once('loaded', () => {
     BuilderApp,
     FileWatcher,
     args,
+    preloadWebView: `file://${path.join(__dirname, 'preload-webview.js')}`,
   }
 })
 

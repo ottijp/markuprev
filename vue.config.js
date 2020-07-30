@@ -8,6 +8,7 @@ module.exports = {
       // workaround: preload depending modules will not be hot reloaded
       preload: {
         preload: 'src/preload.js',
+        'preload-webview': 'src/preload-webview.js',
         BuilderApp: 'src/builder-app.js',
         FileWatcher: 'src/file-watcher.js',
         ConverterFactory: 'src/converter-factory.js',

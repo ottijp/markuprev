@@ -49,6 +49,7 @@ v-app
       //        iframe doesn't have enought function for mark/restore scroll position.
       webview#previewContent.align-self-stretch.flex-grow-1(
         :src="build.url"
+        :preload="preloadWebView"
         @did-finish-load="webviewDidLoad"
         )
 
@@ -66,6 +67,7 @@ const {
   BuilderApp,
   FileWatcher,
   args,
+  preloadWebView,
 } = window.electron
 
 export default {
@@ -84,30 +86,30 @@ export default {
     removed: state => state.build.status === 'removed',
     fileName: state => state.builderApp.watcher.name(),
     filePath: state => state.builderApp.watcher.fullName(),
+    preloadWebView: () => preloadWebView,
   },
 
   mounted() {
     document.ondragover = (e) => {
       e.preventDefault()
     }
+
     document.ondrop = (e) => {
       e.preventDefault()
+      if (e.dataTransfer.files.length > 0) {
+        const filePath = e.dataTransfer.files[0].path
+        this.openFile(filePath)
+      }
     }
-    document.body.addEventListener('drop', (e) => {
-      const filePath = e.dataTransfer.files[0].path
-      this.openFile(filePath)
+
+    getCurrentWindow().webContents.on('did-attach-webview', () => {
+      this.getPreviewContent().addEventListener('ipc-message', e => {
+        if (e.channel === 'ondropfile') {
+          const filePath = e.args[0]
+          this.openFile(filePath)
+        }
+      })
     })
-    // FIXME: no event fired on webview
-    // this.getPreviewContent().ondragover = (e) => {
-    //   e.preventDefault()
-    // }
-    // this.getPreviewContent().ondrop = (e) => {
-    //   e.preventDefault()
-    // }
-    // this.getPreviewContent().addEventListener('drop', (e) => {
-    //   const filePath = e.dataTransfer.files[0].path
-    //   this.openFile(filePath)
-    // })
 
     if (args.file) {
       this.openFile(args.file)
