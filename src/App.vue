@@ -24,6 +24,11 @@ v-app
       //-     v-btn(icon @click="toggleDevTools" v-bind="attrs" v-on="on")
       //-       v-icon mdi-information
       //-   span Toggle DevTools
+      //- v-tooltip(bottom)
+      //-   template(v-slot:activator="{ on, attrs }")
+      //-     v-btn(icon @click="toggleWebViewDevTools" v-bind="attrs" v-on="on")
+      //-       v-icon mdi-information
+      //-   span Toggle WebView DevTools
       v-tooltip(bottom)
         template(v-slot:activator="{ on, attrs }")
           v-btn(icon @click="rebuild" :disabled="building || removed" v-bind="attrs" v-on="on")
@@ -160,6 +165,14 @@ export default {
 
     // toggleDevTools() {
     //   getCurrentWindow().toggleDevTools()
+    // },
+    //
+    // toggleWebViewDevTools() {
+    //   if (this.getPreviewContent().isDevToolsOpened()) {
+    //     this.getPreviewContent().closeDevTools()
+    //   } else {
+    //     this.getPreviewContent().openDevTools()
+    //   }
     // },
 
     async rebuild() {
