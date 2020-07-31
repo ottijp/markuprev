@@ -19,16 +19,17 @@ v-app
     v-app-bar(app dense dark)
       v-toolbar-title {{ fileName }}
       v-spacer
-      //- v-tooltip(bottom)
-      //-   template(v-slot:activator="{ on, attrs }")
-      //-     v-btn(icon @click="toggleDevTools" v-bind="attrs" v-on="on")
-      //-       v-icon mdi-information
-      //-   span Toggle DevTools
-      //- v-tooltip(bottom)
-      //-   template(v-slot:activator="{ on, attrs }")
-      //-     v-btn(icon @click="toggleWebViewDevTools" v-bind="attrs" v-on="on")
-      //-       v-icon mdi-information
-      //-   span Toggle WebView DevTools
+      div(v-if="isDebug")
+        v-tooltip(bottom)
+          template(v-slot:activator="{ on, attrs }")
+            v-btn(icon @click="toggleDevTools" v-bind="attrs" v-on="on")
+              v-icon mdi-information
+          span Toggle DevTools
+        v-tooltip(bottom)
+          template(v-slot:activator="{ on, attrs }")
+            v-btn(icon @click="toggleWebViewDevTools" v-bind="attrs" v-on="on")
+              v-icon mdi-information
+          span Toggle WebView DevTools
       v-btn(@click="openDialog" :disabled="building") Open
       v-tooltip(bottom)
         template(v-slot:activator="{ on, attrs }")
@@ -69,6 +70,7 @@ const {
   FileWatcher,
   args,
   preloadWebView,
+  isDebug,
 } = window.electron
 
 export default {
@@ -88,6 +90,7 @@ export default {
     fileName: state => state.builderApp.watcher.name(),
     filePath: state => state.builderApp.watcher.fullName(),
     preloadWebView: () => preloadWebView,
+    isDebug: () => isDebug,
   },
 
   mounted() {
@@ -165,17 +168,17 @@ export default {
       this.builderApp.startWatch()
     },
 
-    // toggleDevTools() {
-    //   getCurrentWindow().toggleDevTools()
-    // },
-    //
-    // toggleWebViewDevTools() {
-    //   if (this.getPreviewContent().isDevToolsOpened()) {
-    //     this.getPreviewContent().closeDevTools()
-    //   } else {
-    //     this.getPreviewContent().openDevTools()
-    //   }
-    // },
+    toggleDevTools() {
+      getCurrentWindow().toggleDevTools()
+    },
+
+    toggleWebViewDevTools() {
+      if (this.getPreviewContent().isDevToolsOpened()) {
+        this.getPreviewContent().closeDevTools()
+      } else {
+        this.getPreviewContent().openDevTools()
+      }
+    },
 
     async rebuild() {
       this.builderApp.build()

@@ -14,6 +14,7 @@ process.once('loaded', () => {
     FileWatcher,
     args,
     preloadWebView: `file://${path.join(__dirname, 'preload-webview.js')}`,
+    isDebug: process.env.WEBPACK_DEV_SERVER_URL && !process.env.IS_TEST,
   }
 })
 
