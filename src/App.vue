@@ -29,7 +29,7 @@ v-app
       //-     v-btn(icon @click="toggleWebViewDevTools" v-bind="attrs" v-on="on")
       //-       v-icon mdi-information
       //-   span Toggle WebView DevTools
-      v-btn(@click="openDialog" :disabled="building" v-bind="attrs" v-on="on") Open
+      v-btn(@click="openDialog" :disabled="building") Open
       v-tooltip(bottom)
         template(v-slot:activator="{ on, attrs }")
           v-btn(icon @click="rebuild" :disabled="building || removed" v-bind="attrs" v-on="on")
