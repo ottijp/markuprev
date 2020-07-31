@@ -1,7 +1,5 @@
-import Converter from './converter'
 import BuiltinConverterMd from './builtin-converter-md'
-
-const isWin = process.platform.match(/^win/)
+import BuiltinConverterAdoc from './builtin-converter-adoc'
 
 export default class ConverterFactory {
   constructor(config) {
@@ -9,10 +7,9 @@ export default class ConverterFactory {
   }
 
   static makeConverter(ext) {
-    // return new Converter(this.config.getCommand(fileType))
     switch (ext) {
       case 'adoc':
-        return new Converter(isWin ? 'asciidoctor.bat' : 'asciidoctor', ['-o', '-', '-'])
+        return new BuiltinConverterAdoc()
       case 'md':
         return new BuiltinConverterMd()
       default:

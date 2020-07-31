@@ -14,6 +14,7 @@ module.exports = {
         ConverterFactory: 'src/converter-factory.js',
         Converter: 'src/converter.js',
         'buildin-converter-md': 'src/builtin-converter-md.js',
+        'buildin-converter-adoc': 'src/builtin-converter-adoc.js',
         MenuTemplate: 'src/menu-template.js',
       },
       builderOptions: {
