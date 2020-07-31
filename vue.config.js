@@ -13,6 +13,7 @@ module.exports = {
         FileWatcher: 'src/file-watcher.js',
         ConverterFactory: 'src/converter-factory.js',
         Converter: 'src/converter.js',
+        'buildin-converter-md': 'src/builtin-converter-md.js',
         MenuTemplate: 'src/menu-template.js',
       },
       builderOptions: {

@@ -1,4 +1,5 @@
 import Converter from './converter'
+import BuiltinConverterMd from './builtin-converter-md'
 
 const isWin = process.platform.match(/^win/)
 
@@ -13,7 +14,7 @@ export default class ConverterFactory {
       case 'adoc':
         return new Converter(isWin ? 'asciidoctor.bat' : 'asciidoctor', ['-o', '-', '-'])
       case 'md':
-        return new Converter('pandoc', ['-f', 'markdown', '-t', 'html'])
+        return new BuiltinConverterMd()
       default:
         return null
     }

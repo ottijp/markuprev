@@ -18,6 +18,8 @@
   },
   "main": "background.js",
   "dependencies": {
+    "markdown-it": "^11.0.0",
+    "markdown-it-checkbox": "^1.1.0",
     "minimist": "^1.2.5",
     "node-html-parser": "^1.2.20",
     "sass": "^1.26.10",
