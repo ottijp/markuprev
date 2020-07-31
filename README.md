@@ -14,11 +14,6 @@ MarkdownやAsciidocなどの軽量マークアップ言語のプレビューア�
     * .adoc
     * .md
 
-## コンバータの準備
-
-Asciidocを使う場合は[Asciidoctor](https://asciidoctor.org/)を，
-Markdownを使う場合は[Pandoc - About pandoc](https://pandoc.org/)をインストールしてください．
-
 ## インストール
 
 [Releaseページ](https://github.com/ottijp/markuprev/releases)から，各プラットフォーム向けのアプリをダウンロードしてください．
