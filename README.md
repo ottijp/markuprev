@@ -52,7 +52,7 @@ command! MarkuPrev call OpenWithMarkuPrev()
 「ファイル名を指定して実行」機能で，次のように起動します．
 
 ```
-C:\tools\MarkuPrev.exe $F
+path\to\MarkuPrev.exe $F
 ```
 
 ![](sakuraeditor.png)
