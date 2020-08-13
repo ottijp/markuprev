@@ -55,10 +55,6 @@ export default (handlers) => [
   {
     label: 'View',
     submenu: [
-      { role: 'resetzoom' },
-      { role: 'zoomin' },
-      { role: 'zoomout' },
-      { type: 'separator' },
       { role: 'togglefullscreen' },
     ],
   },

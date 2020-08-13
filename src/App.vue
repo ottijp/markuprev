@@ -31,6 +31,12 @@ v-app
               v-icon mdi-information
           span Toggle WebView DevTools
       v-btn(@click="openDialog" :disabled="building") Open
+      v-btn-toggle.mx-5
+        v-btn(icon @click="zoomOut" :disabled="building || removed || !canZoomOut")
+          v-icon mdi-minus
+        v-btn(@click="zoom100" :disabled="building || removed" width="75") {{ zoomFactorPercent }}%
+        v-btn(icon @click="zoomIn" :disabled="building || removed || !canZoomIn")
+          v-icon mdi-plus
       v-tooltip(bottom)
         template(v-slot:activator="{ on, attrs }")
           v-btn(icon @click="rebuild" :disabled="building || removed" v-bind="attrs" v-on="on")
@@ -80,6 +86,7 @@ export default {
     builderApp: null,
     build: { status: 'ready' },
     previewScrollY: 0,
+    zoomFactorPercent: 100,
   }),
 
   computed: {
@@ -91,6 +98,8 @@ export default {
     filePath: state => state.builderApp.watcher.fullName(),
     preloadWebView: () => preloadWebView,
     isDebug: () => isDebug,
+    canZoomOut: state => state.zoomFactorPercent > 25,
+    canZoomIn: state => state.zoomFactorPercent < 500,
   },
 
   mounted() {
@@ -166,6 +175,8 @@ export default {
         }
       })
       this.builderApp.startWatch()
+
+      this.zoomFactorPercent = 100
     },
 
     toggleDevTools() {
@@ -205,6 +216,21 @@ export default {
       if (this.isSourcePage()) {
         await this.restorePosition()
       }
+    },
+
+    zoomIn() {
+      this.zoomFactorPercent += 10
+      this.getPreviewContent().setZoomFactor(this.zoomFactorPercent / 100)
+    },
+
+    zoomOut() {
+      this.zoomFactorPercent -= 10
+      this.getPreviewContent().setZoomFactor(this.zoomFactorPercent / 100)
+    },
+
+    zoom100() {
+      this.zoomFactorPercent = 100
+      this.getPreviewContent().setZoomFactor(this.zoomFactorPercent / 100)
     },
   },
 }
