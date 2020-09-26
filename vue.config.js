@@ -28,10 +28,14 @@ module.exports = {
             ],
           },
           icon: 'src/assets/icon.png',
+          // eslint-disable-next-line no-template-curly-in-string
+          artifactName: '${productName}.${ext}',
         },
         mac: {
           target: 'dmg',
           icon: 'src/assets/icon.png',
+          // eslint-disable-next-line no-template-curly-in-string
+          artifactName: '${productName}.${ext}',
         },
       },
     },
