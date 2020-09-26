@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tag: 'v*'
+
+jobs:
+  buidl:
+    name: Create release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10
+
+      - name: Install Node.js dependencies
+        run: yarn
+
+      - name: Build binary for mac
+        run: yarn electron:build:mac
+
+      - name: Build binary for win
+        run: yarn electron:build:win
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset (mac)
+        id: upload-release-asset_mac
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist_electron/MarkuPrev-${{ github.ref }}.dmg
+          asset_name: MarkuPrev.dmg
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset (win)
+        id: upload-release-asset_win
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist_electron/MarkuPrev ${{ github.ref }}.exe
+          asset_name: MarkuPrev.exe
+          asset_content_type: application/octet-stream
+
