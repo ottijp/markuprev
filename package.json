@@ -15,7 +15,7 @@
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "check-license": "license-checker --production --onlyAllow \"MIT;BSD-3-Clause;BSD-2-Clause;0BSD;ISC;Apache-2.0\" --summary"
+    "check-license": "license-checker --production --onlyAllow \"MIT;BSD-3-Clause;BSD-2-Clause;0BSD;ISC;Apache-2.0\" --unknown --summary"
   },
   "main": "background.js",
   "dependencies": {
