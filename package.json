@@ -6,6 +6,10 @@
     "name": "Satoshi SAKAO"
   },
   "license": "MIT",
+  "engines": {
+    "node": "10.x",
+    "npm": "6.x"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
