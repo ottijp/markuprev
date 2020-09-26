@@ -10,6 +10,8 @@ const md = require('markdown-it')({
   .use(checkbox)
 
 export default class BuiltinConverterMd {
+  // ignore because this method is protocol
+  /* eslint class-methods-use-this: 0 */
   async convert(source) {
     const css = await util.promisify(fs.readFile)(path.join(__static, 'github.css'))
     const body = md.render(source)
