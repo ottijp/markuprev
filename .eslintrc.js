@@ -18,4 +18,7 @@ module.exports = {
     'arrow-parens': 'off',
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
   },
+  globals: {
+    __static: true,
+  },
 }
