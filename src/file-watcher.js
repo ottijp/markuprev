@@ -1,10 +1,12 @@
 import nodeWatch from 'node-watch'
 import path from 'path'
 import fs from 'fs'
+import crypto from 'crypto'
 
 export default class FileWatcher {
   constructor(filePath) {
     this.filePath = path.normalize(filePath)
+    this.fileHash = ''
   }
 
   name() {
@@ -26,6 +28,17 @@ export default class FileWatcher {
 
   watch(fn) {
     this.watcher = nodeWatch(this.filePath, event => {
+      if (event === 'update') {
+        const contents = fs.readFileSync(this.filePath)
+        const md5hash = crypto.createHash('md5')
+        md5hash.update(contents)
+        const hash = md5hash.digest('hex')
+        if (this.fileHash === hash) {
+          // file not really changed
+          return
+        }
+        this.fileHash = hash
+      }
       fn(event)
     })
   }
