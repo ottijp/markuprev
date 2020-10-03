@@ -4,7 +4,7 @@ const asciidoctor = require('asciidoctor')()
 
 export default class BuiltinConverterAdoc {
   // ignore because this method is protocol
-  /* eslint class-methods-use-this: 0 */
+  // eslint-disable-next-line class-methods-use-this
   convert(source) {
     return asciidoctor.convert(source, {
       standalone: true,

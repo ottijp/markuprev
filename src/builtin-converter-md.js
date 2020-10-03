@@ -11,7 +11,7 @@ const md = require('markdown-it')({
 
 export default class BuiltinConverterMd {
   // ignore because this method is protocol
-  /* eslint class-methods-use-this: 0 */
+  // eslint-disable-next-line class-methods-use-this
   async convert(source) {
     const css = await util.promisify(fs.readFile)(path.join(__static, 'github.css'))
     const body = md.render(source)
