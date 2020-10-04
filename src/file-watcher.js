@@ -13,6 +13,10 @@ export default class FileWatcher {
     return path.basename(this.filePath)
   }
 
+  nameWithoutExt() {
+    return path.basename(this.filePath, path.extname(this.filePath))
+  }
+
   dirname() {
     return path.dirname(this.filePath)
   }

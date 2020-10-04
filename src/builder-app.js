@@ -4,6 +4,7 @@ import path from 'path'
 import os from 'os'
 import util from 'util'
 import { parse as parseHTML } from 'node-html-parser'
+import datauri from 'datauri'
 import ConverterFactory from './converter-factory'
 
 export default class BuilderApp extends EventEmitter {
@@ -62,6 +63,41 @@ export default class BuilderApp extends EventEmitter {
 
       await util.promisify(fs.writeFile)(this.builtFile, dom.toString())
       this.emit('built', this.builtFile)
+    } catch (e) {
+      this.emit('failed', e)
+    }
+  }
+
+  async saveHTML(filePath) {
+    const converter = ConverterFactory.makeConverter(this.watcher.ext())
+    if (!converter) {
+      this.emit('failed', new Error(`No converter found for ${this.watcher.ext()}`))
+      return
+    }
+    try {
+      this.emit('saving')
+      const html = await converter.convert(await this.watcher.data())
+      const dom = parseHTML(html, {
+        script: true,
+        style: true,
+        pre: true,
+        comment: false,
+      })
+
+      // replace local image to data-uri
+      // eslint-disable-next-line no-restricted-syntax
+      for await (const img of dom.querySelectorAll('img')) {
+        const src = img.getAttribute('src')
+        if (!src.match(/\/\//) && !src.match(/^#/) && !src.match(/:/)) {
+          // generate data-uri
+          const f = `${path.join(this.watcher.dirname(), src)}`
+          const du = await datauri(f)
+          img.setAttribute('src', du)
+        }
+      }
+
+      await util.promisify(fs.writeFile)(filePath, dom.toString())
+      this.emit('saved', this.builtFile)
     } catch (e) {
       this.emit('failed', e)
     }
