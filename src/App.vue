@@ -217,19 +217,13 @@ export default {
 
     async save() {
       const dresult = await dialog.showSaveDialog(getCurrentWindow(), {
-        defaultPath: this.fileNameWithoutExt,
+        defaultPath: `${this.fileNameWithoutExt}.html`,
       })
       if (dresult.canceled || !dresult.filePath) {
         return
       }
 
-      // add .html if path doesn't have extension
-      let { filePath } = dresult
-      if (filePath.match(/\/[^.]*$/)) {
-        filePath += '.html'
-      }
-
-      this.saveHTML(filePath)
+      this.saveHTML(dresult.filePath)
     },
 
     getPreviewContent() {
