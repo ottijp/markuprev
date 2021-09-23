@@ -83,3 +83,9 @@ yarn electron:build:win
 ```
 yarn lint
 ```
+
+### delete artifacts
+
+```
+yarn clean
+```
