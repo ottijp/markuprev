@@ -3,6 +3,7 @@ import path from 'path'
 import minimist from 'minimist'
 import BuilderApp from './builder-app'
 import FileWatcher from './file-watcher'
+import MarkupFile from './markup-file'
 
 const args = minimist(process.argv)
 
@@ -12,6 +13,7 @@ process.once('loaded', () => {
     getCurrentWindow: remote.getCurrentWindow,
     BuilderApp,
     FileWatcher,
+    MarkupFile,
     args,
     preloadWebView: `file://${path.join(__dirname, 'preload-webview.js')}`,
     isDebug: process.env.WEBPACK_DEV_SERVER_URL && !process.env.IS_TEST,

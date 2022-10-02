@@ -5,8 +5,8 @@ const asciidoctor = require('asciidoctor')()
 export default class BuiltinConverterAdoc {
   // ignore because this method is protocol
   // eslint-disable-next-line class-methods-use-this
-  convert(source) {
-    return asciidoctor.convert(source, {
+  async convert(file) {
+    return asciidoctor.convert(await file.content(), {
       standalone: true,
       attributes: {
         linkcss: false,

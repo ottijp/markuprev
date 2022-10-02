@@ -6,8 +6,8 @@ export default class ConverterFactory {
     this.config = config
   }
 
-  static makeConverter(ext) {
-    switch (ext) {
+  static makeConverter(file) {
+    switch (file.ext) {
       case 'adoc':
         return new BuiltinConverterAdoc()
       case 'md':
