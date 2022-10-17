@@ -32,14 +32,14 @@ export default class BuilderApp extends EventEmitter {
   }
 
   async build() {
-    const converter = ConverterFactory.makeConverter(this.watcher.ext())
+    const converter = ConverterFactory.makeConverter(this.watcher.file)
     if (!converter) {
-      this.emit('failed', new Error(`No converter found for ${this.watcher.ext()}`))
+      this.emit('failed', new Error(`No converter found for ${this.watcher.file.ext}`))
       return
     }
     try {
       this.emit('building')
-      const html = await converter.convert(await this.watcher.data())
+      const html = await converter.convert(this.watcher.file)
       const dom = parseHTML(html, {
         script: true,
         style: true,
@@ -51,13 +51,13 @@ export default class BuilderApp extends EventEmitter {
       dom.querySelectorAll('img').forEach(img => {
         const src = img.getAttribute('src')
         if (!src.match(/\/\//) && !src.match(/^#/) && !src.match(/:/)) {
-          img.setAttribute('src', `file://${path.join(this.watcher.dirname(), src)}`)
+          img.setAttribute('src', `file://${path.join(this.watcher.file.dirname, src)}`)
         }
       })
       dom.querySelectorAll('a').forEach(img => {
         const href = img.getAttribute('href')
         if (!href.match(/\/\//) && !href.match(/^#/) && !href.match(/:/)) {
-          img.setAttribute('href', `file://${path.join(this.watcher.dirname(), href)}`)
+          img.setAttribute('href', `file://${path.join(this.watcher.file.dirname, href)}`)
         }
       })
 
@@ -69,14 +69,14 @@ export default class BuilderApp extends EventEmitter {
   }
 
   async saveHTML(filePath) {
-    const converter = ConverterFactory.makeConverter(this.watcher.ext())
+    const converter = ConverterFactory.makeConverter(this.watcher.file)
     if (!converter) {
-      this.emit('failed', new Error(`No converter found for ${this.watcher.ext()}`))
+      this.emit('failed', new Error(`No converter found for ${this.watcher.file.ext}`))
       return
     }
     try {
       this.emit('saving')
-      const html = await converter.convert(await this.watcher.data())
+      const html = await converter.convert(this.watcher.file)
       const dom = parseHTML(html, {
         script: true,
         style: true,
@@ -90,7 +90,7 @@ export default class BuilderApp extends EventEmitter {
         const src = img.getAttribute('src')
         if (!src.match(/\/\//) && !src.match(/^#/) && !src.match(/:/)) {
           // generate data-uri
-          const f = `${path.join(this.watcher.dirname(), src)}`
+          const f = `${path.join(this.watcher.file.dirname, src)}`
           const du = await datauri(f)
           img.setAttribute('src', du)
         }

@@ -1,42 +1,16 @@
 import nodeWatch from 'node-watch'
-import path from 'path'
-import fs from 'fs'
-import crypto from 'crypto'
+import MarkupFile from './markup-file'
 
 export default class FileWatcher {
   constructor(filePath) {
-    this.filePath = path.normalize(filePath)
+    this.file = new MarkupFile(filePath)
     this.fileHash = ''
   }
 
-  name() {
-    return path.basename(this.filePath)
-  }
-
-  nameWithoutExt() {
-    return path.basename(this.filePath, path.extname(this.filePath))
-  }
-
-  dirname() {
-    return path.dirname(this.filePath)
-  }
-
-  fullName() {
-    return this.filePath
-  }
-
-  ext() {
-    const extname = path.extname(this.filePath)
-    return extname === '' ? extname : extname.substr(1)
-  }
-
   watch(fn) {
-    this.watcher = nodeWatch(this.filePath, event => {
+    this.watcher = nodeWatch(this.file.path, async event => {
       if (event === 'update') {
-        const contents = fs.readFileSync(this.filePath)
-        const md5hash = crypto.createHash('md5')
-        md5hash.update(contents)
-        const hash = md5hash.digest('hex')
+        const hash = await this.file.hash()
         if (this.fileHash === hash) {
           // file not really changed
           return
@@ -49,14 +23,5 @@ export default class FileWatcher {
 
   async unwatch() {
     await this.watcher.close()
-  }
-
-  data() {
-    return new Promise((resolve, reject) => {
-      fs.readFile(this.fullName(), 'utf8', (err, data) => {
-        if (err) reject(err)
-        else resolve(data)
-      })
-    })
   }
 }
