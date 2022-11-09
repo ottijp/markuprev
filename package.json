@@ -7,8 +7,8 @@
   },
   "license": "MIT",
   "engines": {
-    "node": "10.x",
-    "npm": "6.x"
+    "node": "16.x",
+    "npm": "8.x"
   },
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -19,39 +19,39 @@
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "check-license": "license-checker --production --onlyAllow \"MIT;BSD-3-Clause;BSD-2-Clause;0BSD;ISC;Apache-2.0\" --unknown --summary",
+    "check-license": "license-checker --production --onlyAllow \"MIT;BSD-3-Clause;BSD-2-Clause;0BSD;ISC;Apache-2.0;Python-2.0;CC-BY-4.0\" --unknown --summary --excludePackages=\"@vue/compiler-sfc@2.7.13\"",
     "clean": "rm -rf dist dist_electron"
   },
   "main": "background.js",
   "dependencies": {
-    "asciidoctor": "^2.2.0",
-    "datauri": "^3.0.0",
-    "markdown-it": "^11.0.0",
+    "asciidoctor": "^2.2.6",
+    "datauri": "^4.1.0",
+    "markdown-it": "^13.0.1",
     "markdown-it-checkbox": "^1.1.0",
-    "minimist": "^1.2.5",
-    "node-html-parser": "^1.2.20",
-    "sass": "^1.26.10",
-    "sass-loader": "^9.0.2",
+    "minimist": "^1.2.7",
+    "node-html-parser": "^6.1.1",
+    "sass": "^1.55.0",
+    "sass-loader": "^13.1.0",
     "vue": "^2.6.11",
-    "vuetify": "^2.2.11"
+    "vuetify": "^2.6.11"
   },
   "devDependencies": {
-    "@vue/cli-plugin-eslint": "~4.4.0",
-    "@vue/cli-service": "~4.4.0",
-    "@vue/eslint-config-airbnb": "^5.0.2",
-    "electron": "^9.0.0",
-    "electron-devtools-installer": "^3.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-vue": "^6.2.2",
+    "@vue/cli-plugin-eslint": "~5.0.8",
+    "@vue/cli-service": "~5.0.8",
+    "@vue/eslint-config-airbnb": "^7.0.0",
+    "electron": "^21.1.1",
+    "electron-devtools-installer": "^3.2.0",
+    "eslint": "^8.25.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-vue": "^9.6.0",
     "license-checker": "^25.0.1",
-    "node-watch": "^0.6.4",
-    "stylus": "^0.54.7",
-    "stylus-loader": "^3.0.2",
-    "vue-cli-plugin-electron-builder": "~2.0.0-rc.4",
-    "vue-cli-plugin-pug": "~1.0.7",
-    "vue-cli-plugin-vuetify": "~2.0.6",
-    "vue-template-compiler": "^2.6.11",
-    "vuetify-loader": "^1.3.0"
+    "node-watch": "^0.7.3",
+    "stylus": "^0.59.0",
+    "stylus-loader": "^7.1.0",
+    "vue-cli-plugin-electron-builder": "~2.1.1",
+    "vue-cli-plugin-pug": "~2.0.0",
+    "vue-cli-plugin-vuetify": "~2.5.8",
+    "vue-template-compiler": "^2.7.13",
+    "vuetify-loader": "^1.9.2"
   }
 }
