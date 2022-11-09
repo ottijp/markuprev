@@ -1,6 +1,6 @@
 <template lang="pug">
 v-app
-  div(v-if="!builderApp")
+  div(v-if="isDropAreaShown")
     v-main.vh100
       v-container.fill-height
         v-row(justify="center")
@@ -17,7 +17,7 @@ v-app
 
   div(v-else)
     v-app-bar(app dense dark)
-      v-btn(@click="openDialog" :disabled="building") Open
+      v-btn(@click="openDialog" :disabled="!isOpenDiableEnalbed") Open
       v-spacer
       div(v-if="isDebug")
         v-tooltip(bottom)
@@ -27,42 +27,41 @@ v-app
           span Toggle DevTools
         v-tooltip(bottom)
           template(v-slot:activator="{ on, attrs }")
-            v-btn(icon @click="toggleWebViewDevTools" v-bind="attrs" v-on="on")
+            v-btn(icon @click="toggleContentViewDevTools" v-bind="attrs" v-on="on")
               v-icon mdi-information
-          span Toggle WebView DevTools
+          span Toggle ContentView DevTools
       v-btn-toggle.mx-5
-        v-btn(icon @click="zoomOut" :disabled="building || removed || !canZoomOut")
+        v-btn(icon @click="zoomOut" :disabled="!isZoomOutEnalbed")
           v-icon mdi-minus
-        v-btn(@click="zoom100" :disabled="building || removed" width="75") {{ zoomFactorPercent }}%
-        v-btn(icon @click="zoomIn" :disabled="building || removed || !canZoomIn")
+        v-btn(@click="zoom100" :disabled="!isZoom100Enabled" width="75") {{ zoomFactorPercent }}%
+        v-btn(icon @click="zoomIn" :disabled="!isZoomInEnalbed")
           v-icon mdi-plus
       v-tooltip(bottom)
         template(v-slot:activator="{ on, attrs }")
-          v-btn(icon @click="rebuild" :disabled="building || removed" v-bind="attrs" v-on="on")
+          v-btn(icon @click="rebuild" :disabled="!isBuildEnabled" v-bind="attrs" v-on="on")
             v-icon mdi-reload
         span Rebuild
       v-tooltip(bottom)
         template(v-slot:activator="{ on, attrs }")
-          v-btn(icon @click="save" :disabled="saving || removed" v-bind="attrs" v-on="on")
+          v-btn(icon @click="save" :disabled="!isSaveEnabled" v-bind="attrs" v-on="on")
             v-icon mdi-export
         span Save HTML
-    v-main.vh100(v-if="building")
+    v-main.vh100(v-if="buildState === 'building'")
       v-container
-        p Bulding...
-    v-main.vh100(v-else-if="failed")
+        p Building...
+    v-main.vh100(v-else-if="buildState === 'error'")
       v-container
-        p Build failed
-        pre {{ build.errorMessage }}
-    v-main.vh100(v-else-if="removed")
+        p Build error
+        pre {{ errorMessage }}
+    v-main.vh100(v-else-if="buildState === 'removed'")
       v-container
         p File removed
     v-main.vh100(v-else)
-      // FIXME: can't inspect elements in webview.
-      //        iframe doesn't have enought function for mark/restore scroll position.
       webview#previewContent.align-self-stretch.flex-grow-1(
-        :src="build.url"
-        :preload="preloadWebView"
-        @did-finish-load="webviewDidLoad"
+        :src="contentUrl"
+        :preload="contentViewPreloadUrl"
+        @did-attach="contentViewDidAttach"
+        @dom-ready="contentViewDomReady"
         )
 
     v-footer(app)
@@ -72,43 +71,31 @@ v-app
 </template>
 
 <script>
-// exported in preload.js
-const {
-  dialog,
-  getCurrentWindow,
-  BuilderApp,
-  FileWatcher,
-  args,
-  preloadWebView,
-  isDebug,
-} = window.electron
-
 export default {
   name: 'App',
 
   data: () => ({
-    builderApp: null,
-    build: { status: 'ready' },
-    previewScrollY: 0,
+    buildState: 'waiting-file',
+    errorMessage: '',
     zoomFactorPercent: 100,
+    isDebug: false,
+    contentUrl: '',
+    filePath: '',
+    contentViewPreloadUrl: '',
+    contentViewReady: false,
   }),
 
   computed: {
-    // webviewUri: state => `data:text/html;charset=utf-8,${encodeURIComponent(state.html)}`,
-    building: state => state.build.status === 'building',
-    failed: state => state.build.status === 'failed',
-    removed: state => state.build.status === 'removed',
-    saving: state => state.build.status === 'saving',
-    fileName: state => state.builderApp.watcher.file.name,
-    fileNameWithoutExt: state => state.builderApp.watcher.file.nameWithoutExt,
-    filePath: state => state.builderApp.watcher.file.path,
-    preloadWebView: () => preloadWebView,
-    isDebug: () => isDebug,
-    canZoomOut: state => state.zoomFactorPercent > 25,
-    canZoomIn: state => state.zoomFactorPercent < 500,
+    isDropAreaShown: state => state.buildState === 'waiting-file',
+    isOpenDiableEnalbed: state => state.buildState !== 'building' && state.buildState !== 'saving',
+    isZoomOutEnalbed: state => state.zoomFactorPercent > 25 && state.buildState !== 'removed' && state.buildState !== 'building',
+    isZoomInEnalbed: state => state.zoomFactorPercent < 500 && state.buildState !== 'removed' && state.buildState !== 'building',
+    isZoom100Enabled: state => state.buildState !== 'removed' && state.buildState !== 'building',
+    isBuildEnabled: state => state.buildState !== 'removed' && state.buildState !== 'building',
+    isSaveEnabled: state => state.buildState !== 'removed' && state.buildState !== 'saving',
   },
 
-  mounted() {
+  async mounted() {
     document.ondragover = (e) => {
       e.preventDefault()
     }
@@ -117,151 +104,107 @@ export default {
       e.preventDefault()
       if (e.dataTransfer.files.length > 0) {
         const filePath = e.dataTransfer.files[0].path
-        this.openFile(filePath)
+        window.api.openFile(filePath)
       }
     }
 
-    getCurrentWindow().webContents.on('did-attach-webview', () => {
-      this.getPreviewContent().addEventListener('ipc-message', e => {
-        if (e.channel === 'ondropfile') {
-          const filePath = e.args[0]
-          this.openFile(filePath)
-        }
-      })
+    window.api.onFileOpened((event, filePath) => {
+      this.filePath = filePath
+      if (this.getContentView()) {
+        this.zoom100()
+      }
+      this.buildState = 'ready'
     })
 
-    if (args.file) {
-      this.openFile(args.file)
-    }
+    window.api.onBuilding(() => {
+    })
+
+    window.api.onBuilt((event, builtFilePath) => {
+      this.buildState = 'built'
+      this.contentUrl = `file://${builtFilePath}`
+      if (this.contentViewReady) {
+        this.getContentView().reload()
+      }
+    })
+
+    window.api.onError((event, errorMessage) => {
+      this.buildState = 'error'
+      this.errorMessage = errorMessage
+    })
+
+    window.api.onRemoved(() => {
+      this.buildState = 'removed'
+    })
+
+    window.api.onSaving(() => {
+      this.buildState = 'saving'
+    })
+
+    window.api.onSaved(() => {
+    })
+
+    this.isDebug = await window.api.isDebug()
+    this.contentViewPreloadUrl = `file://${await window.api.contentViewPreloadPath()}`
+
+    window.api.openInitialFile()
   },
 
   methods: {
     async openDialog() {
-      const dresult = await dialog.showOpenDialog(getCurrentWindow())
-      if (dresult.canceled || dresult.filePaths.length < 1) {
-        return
-      }
-
-      const [filePath] = dresult.filePaths
-      this.openFile(filePath)
-    },
-
-    async openFile(filePath) {
-      if (this.builderApp) {
-        await this.builderApp.stopWatch()
-        this.builderApp = null
-      }
-
-      this.build = { status: 'ready' }
-      this.builderApp = new BuilderApp(new FileWatcher(filePath))
-      this.builderApp.on('built', builtFile => {
-        const url = `file://${builtFile}`
-        this.build = {
-          status: 'built',
-          url,
-        }
-      })
-      this.builderApp.on('failed', e => {
-        this.build = {
-          status: 'failed',
-          errorMessage: e,
-        }
-      })
-      this.builderApp.on('building', async () => {
-        if (!this.building && this.isSourcePage()) {
-          this.markPosition()
-        }
-        this.build = {
-          status: 'building',
-        }
-      })
-      this.builderApp.on('removed', async () => {
-        this.build = {
-          status: 'removed',
-        }
-      })
-      this.builderApp.on('saving', async () => {
-        this.build = {
-          status: 'saving',
-        }
-      })
-      this.builderApp.on('saved', async () => {
-        this.build = {
-          status: 'saved',
-        }
-      })
-      this.builderApp.startWatch()
-
-      this.zoomFactorPercent = 100
-    },
-
-    async saveHTML(filePath) {
-      await this.builderApp.saveHTML(filePath)
+      window.api.openFile()
     },
 
     toggleDevTools() {
-      getCurrentWindow().toggleDevTools()
+      window.api.toggleDevTools()
     },
 
-    toggleWebViewDevTools() {
-      if (this.getPreviewContent().isDevToolsOpened()) {
-        this.getPreviewContent().closeDevTools()
+    toggleContentViewDevTools() {
+      if (this.getContentView().isDevToolsOpened()) {
+        this.getContentView().closeDevTools()
       } else {
-        this.getPreviewContent().openDevTools()
+        this.getContentView().openDevTools()
       }
     },
 
     async rebuild() {
-      this.builderApp.build()
+      window.api.rebuild()
     },
 
     async save() {
-      const dresult = await dialog.showSaveDialog(getCurrentWindow(), {
-        defaultPath: `${this.fileNameWithoutExt}.html`,
-      })
-      if (dresult.canceled || !dresult.filePath) {
-        return
-      }
-
-      this.saveHTML(dresult.filePath)
+      window.api.save()
     },
 
-    getPreviewContent() {
+    getContentView() {
       return document.getElementById('previewContent')
     },
 
-    async markPosition() {
-      this.previewScrollY = await this.getPreviewContent().executeJavaScript('window.scrollY')
+    contentViewDidAttach(event) {
+      // listen drop event from guest webview
+      event.target.addEventListener('ipc-message', e => {
+        if (e.channel === 'ondropfile') {
+          const filePath = e.args[0]
+          window.api.openFile(filePath)
+        }
+      })
     },
 
-    async restorePosition() {
-      await this.getPreviewContent().executeJavaScript(`window.scrollTo(0, ${this.previewScrollY})`)
-    },
-
-    isSourcePage() {
-      const previewContent = this.getPreviewContent()
-      return previewContent && previewContent.src.match(/^file:\/\//) !== null
-    },
-
-    async webviewDidLoad() {
-      if (this.isSourcePage()) {
-        await this.restorePosition()
-      }
+    contentViewDomReady(event) {
+      this.contentViewReady = true
     },
 
     zoomIn() {
       this.zoomFactorPercent += 10
-      this.getPreviewContent().setZoomFactor(this.zoomFactorPercent / 100)
+      this.getContentView().setZoomFactor(this.zoomFactorPercent / 100)
     },
 
     zoomOut() {
       this.zoomFactorPercent -= 10
-      this.getPreviewContent().setZoomFactor(this.zoomFactorPercent / 100)
+      this.getContentView().setZoomFactor(this.zoomFactorPercent / 100)
     },
 
     zoom100() {
       this.zoomFactorPercent = 100
-      this.getPreviewContent().setZoomFactor(this.zoomFactorPercent / 100)
+      this.getContentView().setZoomFactor(this.zoomFactorPercent / 100)
     },
   },
 }

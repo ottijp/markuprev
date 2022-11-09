@@ -1,27 +1,19 @@
-import { remote } from 'electron'
-import path from 'path'
-import minimist from 'minimist'
-import BuilderApp from './builder-app'
-import FileWatcher from './file-watcher'
-import MarkupFile from './markup-file'
+const { contextBridge, ipcRenderer } = require('electron')
 
-const args = minimist(process.argv)
+contextBridge.exposeInMainWorld('api', {
+  openFile: (filePath) => ipcRenderer.send('openFile', filePath),
+  rebuild: () => ipcRenderer.send('rebuild'),
+  save: () => ipcRenderer.send('save'),
+  openInitialFile: () => ipcRenderer.send('openInitialFile'),
+  toggleDevTools: () => ipcRenderer.send('toggleDevTools'),
+  isDebug: () => ipcRenderer.invoke('isDebug'),
+  contentViewPreloadPath: () => ipcRenderer.invoke('contentViewPreloadPath'),
 
-process.once('loaded', () => {
-  window.electron = {
-    dialog: remote.dialog,
-    getCurrentWindow: remote.getCurrentWindow,
-    BuilderApp,
-    FileWatcher,
-    MarkupFile,
-    args,
-    preloadWebView: `file://${path.join(__dirname, 'preload-webview.js')}`,
-    isDebug: process.env.WEBPACK_DEV_SERVER_URL && !process.env.IS_TEST,
-  }
+  onFileOpened: (callback) => ipcRenderer.on('opened', callback),
+  onBuilding: (callback) => ipcRenderer.on('building', callback),
+  onBuilt: (callback) => ipcRenderer.on('built', callback),
+  onError: (callback) => ipcRenderer.on('error', callback),
+  onRemoved: (callback) => ipcRenderer.on('removed', callback),
+  onSaving: (callback) => ipcRenderer.on('saving', callback),
+  onSaved: (callback) => ipcRenderer.on('saved', callback),
 })
-
-// set PATH env
-const isMac = process.platform === 'darwin'
-if (isMac) {
-  process.env.PATH = `${process.env.PATH}${path.delimiter}/usr/local/bin`
-}
