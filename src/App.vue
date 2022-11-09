@@ -188,7 +188,7 @@ export default {
       })
     },
 
-    contentViewDomReady(event) {
+    contentViewDomReady() {
       this.contentViewReady = true
     },
 
