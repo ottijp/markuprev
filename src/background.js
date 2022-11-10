@@ -123,7 +123,6 @@ function bindIpc() {
   ipcMain.on('openInitialFile', async (event) => {
     const win = BrowserWindow.fromWebContents(event.sender)
     const { initialFilePath } = windows[win.id]
-    console.log('initialFilePath', win, initialFilePath)
     if (initialFilePath) {
       openFile(win, initialFilePath)
     }
