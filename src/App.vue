@@ -46,10 +46,7 @@ v-app
           v-btn(icon @click="save" :disabled="!isSaveEnabled" v-bind="attrs" v-on="on")
             v-icon mdi-export
         span Save HTML
-    v-main.vh100(v-if="buildState === 'building'")
-      v-container
-        p Building...
-    v-main.vh100(v-else-if="buildState === 'error'")
+    v-main.vh100(v-if="buildState === 'error'")
       v-container
         p Build error
         pre {{ errorMessage }}
@@ -66,8 +63,11 @@ v-app
 
     v-footer(app)
       v-container(fluid).ma-1.pa-1
-        v-row(no-gutters)
-          span {{ filePath }}
+        v-row.d-flex(no-gutters)
+          v-col.flex-grow-1
+            span {{ filePath }}
+          v-col.flex-grow-0
+            v-progress-circular(v-if="buildState === 'building'", indeterminate, size="20", width="2")
 </template>
 
 <script>
@@ -117,6 +117,7 @@ export default {
     })
 
     window.api.onBuilding(() => {
+      this.buildState = 'building'
     })
 
     window.api.onBuilt((event, builtFilePath) => {
