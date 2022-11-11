@@ -121,11 +121,11 @@ export default {
     })
 
     window.api.onBuilt((event, builtFilePath) => {
-      this.buildState = 'built'
-      this.contentUrl = `file://${builtFilePath}`
       if (this.contentViewReady) {
         this.getContentView().reload()
       }
+      this.buildState = 'built'
+      this.contentUrl = `file://${builtFilePath}`
     })
 
     window.api.onError((event, errorMessage) => {
