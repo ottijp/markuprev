@@ -48,8 +48,15 @@ function createWindow(filePath) {
   }
 
   // add to window collection
+  const builder = new BuilderApp()
+  builder.on('built', builtFilePath => win.webContents.send('built', builtFilePath))
+  builder.on('error', e => win.webContents.send('error', e))
+  builder.on('building', () => win.webContents.send('building'))
+  builder.on('removed', () => win.webContents.send('removed'))
+  builder.on('saving', () => win.webContents.send('saving'))
+  builder.on('saved', () => win.webContents.send('saved'))
   windows[win.id] = {
-    builder: new BuilderApp(),
+    builder,
     initialFilePath: filePath,
   }
 
@@ -62,16 +69,8 @@ function createWindow(filePath) {
 // open file and bind builder with window
 function openFile(win, filePath) {
   const { builder } = windows[win.id]
-
-  builder.on('built', builtFilePath => win.webContents.send('built', builtFilePath))
-  builder.on('error', e => win.webContents.send('error', e))
-  builder.on('building', () => win.webContents.send('building'))
-  builder.on('removed', () => win.webContents.send('removed'))
-  builder.on('saving', () => win.webContents.send('saving'))
-  builder.on('saved', () => win.webContents.send('saved'))
-
-  builder.startWatch(filePath)
   win.webContents.send('opened', filePath)
+  builder.startWatch(filePath)
 }
 
 // open file with dialog
