@@ -10,6 +10,7 @@ module.exports = {
       },
       builderOptions: {
         appId: 'biz.sakao.markuprev',
+        /* eslint-disable-next-line no-template-curly-in-string */
         artifactName: '${productName}-${version}-${arch}.${ext}',
         win: {
           target: {
@@ -19,7 +20,6 @@ module.exports = {
             ],
           },
           icon: 'src/assets/icon.png',
-          // eslint-disable-next-line no-template-curly-in-string
         },
         mac: {
           target: {
@@ -30,7 +30,6 @@ module.exports = {
             ],
           },
           icon: 'src/assets/icon.png',
-          // eslint-disable-next-line no-template-curly-in-string
         },
       },
     },
