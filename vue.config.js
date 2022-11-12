@@ -11,7 +11,7 @@ module.exports = {
       builderOptions: {
         appId: 'biz.sakao.markuprev',
         /* eslint-disable-next-line no-template-curly-in-string */
-        artifactName: '${productName}-${version}-${arch}.${ext}',
+        artifactName: '${productName}-v${version}-${arch}.${ext}',
         win: {
           target: {
             target: 'portable',
