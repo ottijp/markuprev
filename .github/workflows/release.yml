@@ -22,10 +22,10 @@ jobs:
         run: yarn
 
       - name: Build binary for mac
-        run: yarn electron:build:mac
+        run: yarn electron:build:mac --publish never
 
       - name: Build binary for win
-        run: yarn electron:build:win
+        run: yarn electron:build:win --publish never
 
       - name: Create Release
         id: create_release
