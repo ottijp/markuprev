@@ -5,7 +5,7 @@ on:
     tags: 'v*'
 
 jobs:
-  buidl:
+  build:
     name: Create release
     runs-on: macos-latest
 
