@@ -10,23 +10,27 @@ module.exports = {
       },
       builderOptions: {
         appId: 'biz.sakao.markuprev',
+        artifactName: '${productName}-${version}-${arch}.${ext}',
         win: {
           target: {
             target: 'portable',
             arch: [
               'x64',
-              'ia32',
             ],
           },
           icon: 'src/assets/icon.png',
           // eslint-disable-next-line no-template-curly-in-string
-          artifactName: '${productName}.${ext}',
         },
         mac: {
-          target: 'dmg',
+          target: {
+            target: 'dmg',
+            arch: [
+              'x64',
+              'arm64',
+            ],
+          },
           icon: 'src/assets/icon.png',
           // eslint-disable-next-line no-template-curly-in-string
-          artifactName: '${productName}.${ext}',
         },
       },
     },
