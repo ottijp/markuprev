@@ -5,7 +5,7 @@ on:
     tags: 'v*'
 
 jobs:
-  buidl:
+  build:
     name: Create release
     runs-on: macos-latest
 
@@ -22,10 +22,10 @@ jobs:
         run: yarn
 
       - name: Build binary for mac
-        run: yarn electron:build:mac
+        run: yarn electron:build:mac --publish never
 
       - name: Build binary for win
-        run: yarn electron:build:win
+        run: yarn electron:build:win --publish never
 
       - name: Create Release
         id: create_release
@@ -33,20 +33,31 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset (mac)
-        id: upload-release-asset_mac
+      - name: Upload Release Asset (intel mac)
+        id: upload-release-asset_mac_intel
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist_electron/MarkuPrev.dmg
-          asset_name: MarkuPrev.dmg
+          asset_path: ./dist_electron/MarkuPrev-${{ github.ref_name }}-x64.dmg
+          asset_name: MarkuPrev-${{ github.ref_name }}-x64.dmg
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset (apple silicon mac)
+        id: upload-release-asset_mac_apple_silicon
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist_electron/MarkuPrev-${{ github.ref_name }}-arm64.dmg
+          asset_name: MarkuPrev-${{ github.ref_name }}-arm64.dmg
           asset_content_type: application/octet-stream
 
       - name: Upload Release Asset (win)
@@ -56,7 +67,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist_electron/MarkuPrev.exe
-          asset_name: MarkuPrev.exe
+          asset_path: ./dist_electron/MarkuPrev-${{ github.ref_name }}-x64.exe
+          asset_name: MarkuPrev-${{ github.ref_name }}-x64.exe
           asset_content_type: application/octet-stream
 
