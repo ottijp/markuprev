@@ -23,6 +23,9 @@ jobs:
 
       - name: Build binary for mac
         run: yarn electron:build:mac --publish never
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_PASSWORD: ${{ secrets.CSC_PASSWORD }}
 
       - name: Build binary for win
         run: yarn electron:build:win --publish never
