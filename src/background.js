@@ -61,8 +61,8 @@ function createWindow(filePath) {
   }
 
   // remove from window collection on closing window
-  win.on('close', (event) => {
-    delete windows[event.sender.id]
+  win.on('close', () => {
+    delete windows[win.id]
   })
 }
 
