@@ -63,9 +63,15 @@ v-app
 
     v-footer(app)
       v-container(fluid).ma-1.pa-1
-        v-row.d-flex(no-gutters)
+        v-row.d-flex(no-gutters).align-center
+          v-col.flex-grow-0
+            v-tooltip(top)
+              template(v-slot:activator="{ on, attrs }")
+                v-btn(icon size="small" @click="toggleHideFilePath" v-bind="attrs" v-on="on")
+                  v-icon {{ toggleHideFilePathIcon }}
+              span {{ toggleHideFilePathToolTip }}
           v-col.flex-grow-1
-            span {{ filePath }}
+            span(v-if="!isHideFilePath") {{ filePath }}
           v-col.flex-grow-0
             v-progress-circular(v-if="buildState === 'building'", indeterminate, size="20", width="2")
 </template>
@@ -81,6 +87,7 @@ export default {
     isDebug: false,
     contentUrl: '',
     filePath: '',
+    isHideFilePath: false,
     contentViewPreloadUrl: '',
     contentViewReady: false,
   }),
@@ -93,6 +100,8 @@ export default {
     isZoom100Enabled: state => state.buildState !== 'removed' && state.buildState !== 'building',
     isBuildEnabled: state => state.buildState !== 'removed' && state.buildState !== 'building',
     isSaveEnabled: state => state.buildState !== 'removed' && state.buildState !== 'saving',
+    toggleHideFilePathToolTip: state => (state.isHideFilePath ? 'Show file path' : 'Hide file path'),
+    toggleHideFilePathIcon: state => (state.isHideFilePath ? 'mdi-eye-outline' : 'mdi-eye-off-outline'),
   },
 
   async mounted() {
@@ -206,6 +215,10 @@ export default {
     zoom100() {
       this.zoomFactorPercent = 100
       this.getContentView().setZoomFactor(this.zoomFactorPercent / 100)
+    },
+
+    toggleHideFilePath() {
+      this.isHideFilePath = !this.isHideFilePath
     },
   },
 }
