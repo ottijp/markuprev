@@ -64,10 +64,10 @@ v-app
     v-footer(app)
       v-container(fluid).ma-1.pa-1
         v-row.d-flex(no-gutters).align-center
-          v-col.flex-grow-0
+          v-col.flex-grow-0.mr-1
             v-tooltip(top)
               template(v-slot:activator="{ on, attrs }")
-                v-btn(icon size="small" @click="toggleHideFilePath" v-bind="attrs" v-on="on")
+                v-btn(icon small @click="toggleHideFilePath" v-bind="attrs" v-on="on")
                   v-icon {{ toggleHideFilePathIcon }}
               span {{ toggleHideFilePathToolTip }}
           v-col.flex-grow-1
