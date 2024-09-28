@@ -1,6 +1,6 @@
 <template lang="pug">
 v-app
-  div(v-if="isDropAreaShown")
+  template(v-if="isDropAreaShown")
     v-main.vh100
       v-container.fill-height
         v-row(justify="center")
@@ -15,7 +15,7 @@ v-app
                 v-row(justify="center")
                   v-btn(@click="openDialog" color="primary" x-large) or Open in dialog
 
-  div(v-else)
+  template(v-else)
     v-app-bar(app dense dark)
       v-btn(@click="openDialog" :disabled="!isOpenDiableEnalbed") Open
       v-spacer
@@ -46,14 +46,16 @@ v-app
           v-btn(icon @click="save" :disabled="!isSaveEnabled" v-bind="attrs" v-on="on")
             v-icon mdi-export
         span Save HTML
-    v-main.vh100(v-if="buildState === 'error'")
+    // workaround: v-main won't be resized depend on the height of v-footer. (bug?)
+    // so, I didn't applied `app` attribute on v-footer and applied `flex-grow` class on v-main.
+    v-main(v-if="buildState === 'error'")
       v-container
         p Build error
         pre {{ errorMessage }}
-    v-main.vh100(v-else-if="buildState === 'removed'")
+    v-main(v-else-if="buildState === 'removed'")
       v-container
         p File removed
-    v-main.vh100(v-else)
+    v-main(v-else)
       webview#previewContent.align-self-stretch.flex-grow-1(
         :src="contentUrl"
         :preload="contentViewPreloadUrl"
@@ -61,19 +63,16 @@ v-app
         @dom-ready="contentViewDomReady"
         )
 
-    v-footer(app)
-      v-container(fluid).ma-1.pa-1
-        v-row.d-flex(no-gutters).align-center
-          v-col.flex-grow-0.mr-1
-            v-tooltip(top)
-              template(v-slot:activator="{ on, attrs }")
-                v-btn(icon small @click="toggleHideFilePath" v-bind="attrs" v-on="on")
-                  v-icon {{ toggleHideFilePathIcon }}
-              span {{ toggleHideFilePathToolTip }}
-          v-col.flex-grow-1
-            span(v-if="!isHideFilePath") {{ filePath }}
-          v-col.flex-grow-0
-            v-progress-circular(v-if="buildState === 'building'", indeterminate, size="20", width="2")
+    v-footer.d-flex.flex-nowrap
+      v-tooltip(top)
+        template(v-slot:activator="{ on, attrs }")
+          v-btn(icon small @click="toggleHideFilePath" v-bind="attrs" v-on="on").mx-1.flex-shrink-0
+            v-icon {{ toggleHideFilePathIcon }}
+        span-path {{ toggleHideFilePathToolTip }}
+      span(v-if="!isHideFilePath").mx-1.flex-grow-1.text-caption.file-path {{ filePath }}
+      span(v-else).flex-grow-1
+      v-progress-circular(v-if="buildState === 'building'", indeterminate, size="20"
+      width="2").mx-1.flex-shrink-0
 </template>
 
 <script>
@@ -228,10 +227,10 @@ export default {
 #previewContent
   height 100%
   width 100%
-.vh100
-  height 100vh
 .droparea
   height: 500px
   border 10px gray dashed
   border-radius 10px
+.file-path
+  word-break: break-all
 </style>
