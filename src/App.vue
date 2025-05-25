@@ -57,7 +57,7 @@ v-app
         p File removed
     v-main(v-else)
       webview#previewContent.align-self-stretch.flex-grow-1(
-        allowpopups="true"
+        :allowpopups="true"
         :src="contentUrl"
         :preload="contentViewPreloadUrl"
         @did-attach="contentViewDidAttach"
