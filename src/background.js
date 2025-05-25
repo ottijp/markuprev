@@ -1,5 +1,5 @@
 import {
-  app, protocol, BrowserWindow, Menu, ipcMain, dialog,
+  app, protocol, BrowserWindow, Menu, ipcMain, dialog, shell,
 } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
@@ -46,6 +46,21 @@ function createWindow(filePath) {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
+
+  // open link in system browser
+  win.webContents.on('did-attach-webview', (_, webViewContents) => {
+    webViewContents.setWindowOpenHandler(({ url }) => {
+      // Workaround:
+      // This method must return object (not Promise).
+      // That's why I can't wait `openExternal()`'s response.
+      shell.openExternal(url)
+        .catch(e => {
+          const msg = `URL: ${url}\n${e.toString()}`
+          dialog.showErrorBox('Can\'t open URL', msg)
+        })
+      return { action: 'deny' }
+    })
+  })
 
   // add to window collection
   const builder = new BuilderApp()

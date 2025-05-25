@@ -57,6 +57,7 @@ v-app
         p File removed
     v-main(v-else)
       webview#previewContent.align-self-stretch.flex-grow-1(
+        allowpopups="true"
         :src="contentUrl"
         :preload="contentViewPreloadUrl"
         @did-attach="contentViewDidAttach"
@@ -199,6 +200,15 @@ export default {
 
     contentViewDomReady() {
       this.contentViewReady = true
+      this.getContentView().executeJavaScript(`
+        Array.from(document.querySelectorAll('a')).forEach(a => {
+          const href = a.getAttribute('href')
+          if (href && !href.match(/^#/)) {
+            a.setAttribute('target', '_blank')
+            a.setAttribute('rel', 'noopener noreferrer')
+          }
+        })
+      `)
     },
 
     zoomIn() {
