@@ -8,8 +8,9 @@ MarkdownやAsciidocなどの軽量マークアップ言語のプレビューア�
 ## 対応
 
 * プラットフォーム
-    * macOS
-    * Windows
+    * macOS (x64, Apple Silicon)
+    * Windows (x64)
+    * Linux (x64)
 * ファイルタイプ
     * .adoc
     * .md
@@ -32,13 +33,19 @@ MarkdownやAsciidocなどの軽量マークアップ言語のプレビューア�
 ```vim
 " for mac
 function! OpenWithMarkuPrev()
-  echo system('open /Applications/MarkuPrev.app' . ' -n --args ' . shellescape(expand('%:p')))
+  call system('open /Applications/MarkuPrev.app' . ' -n --args ' . shellescape(expand('%:p')))
 endfunction
 command! MarkuPrev call OpenWithMarkuPrev()
 
 " for windows
 function! OpenWithMarkuPrev()
-  echo system('path/to/MarkuPrev.exe' . ' ' . shellescape(expand('%:p')))
+  call system('path/to/MarkuPrev.exe' . ' ' . shellescape(expand('%:p')))
+endfunction
+command! MarkuPrev call OpenWithMarkuPrev()
+
+" for linux
+function! OpenWithMarkuPrev()
+  call system('nohup path/to/MarkuPrev.appImage' . ' ' . shellescape(expand('%:p')) . ' &')
 endfunction
 command! MarkuPrev call OpenWithMarkuPrev()
 ```
@@ -61,31 +68,35 @@ path\to\MarkuPrev.exe $F
 
 ### Project setup
 
-```
+```sh
 yarn install
 ```
 
 ### Compiles and hot-reloads for development
 
-```
-yarn electron:serve
+```sh
+yarn dev
 ```
 
 ### Compiles and minifies for production
 
-```
-yarn electron:build:mac
+```sh
 yarn electron:build:win
+yarn electron:build:linux
+export APPLE_ID="YOURS"
+export APPLE_APP_SPECIFIC_PASSWORD="YOURS"
+export APPLE_TEAM_ID="YOURS"
+op run --env-file=.env -- yarn electron:build:mac
 ```
 
 ### Lints and fixes files
 
-```
+```sh
 yarn lint
 ```
 
 ### delete artifacts
 
-```
+```sh
 yarn clean
 ```

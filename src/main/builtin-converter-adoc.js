@@ -4,7 +4,6 @@ const asciidoctor = require('asciidoctor')()
 
 export default class BuiltinConverterAdoc {
   // ignore because this method is protocol
-  // eslint-disable-next-line class-methods-use-this
   async convert(file) {
     const convertParams = {
       base_dir: file.dirname,
@@ -26,7 +25,7 @@ export default class BuiltinConverterAdoc {
     // in production, asciidoctor.js import `./css/asciidoctor.js` as default. so stylesheet
     // attribute should not be set.
     if (process.env.NODE_ENV === 'development') {
-      convertParams.attributes.stylesheet = path.join(__static, 'css', 'asciidoctor.css@')
+      convertParams.attributes.stylesheet = path.join(__dirname, '..', '..', 'resources', 'css', '/asciidoctor.css')
     }
 
     return asciidoctor.convert(await file.content(), convertParams)

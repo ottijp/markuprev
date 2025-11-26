@@ -104,7 +104,6 @@ export default class BuilderApp extends EventEmitter {
       })
 
       // replace local image to data-uri
-      // eslint-disable-next-line no-restricted-syntax
       for await (const img of dom.querySelectorAll('img')) {
         const src = img.getAttribute('src')
         if (!src.match(/\/\//) && !src.match(/^#/) && !src.match(/:/)) {

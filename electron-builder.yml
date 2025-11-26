@@ -1,0 +1,40 @@
+appId: biz.sakao.markuprev
+productName: MarkuPrev
+files:
+  - 'out/**'
+  - 'resources/**'
+  - 'package.json'
+  - '!**/*.map'
+  - '!**/node_modules/**/test/**'
+  - '!**/node_modules/**/docs/**'
+  - '!**/node_modules/**/example/**'
+afterSign: installer/mac/notarize.js
+icon: src/assets/icon.png
+win:
+  target:
+    target: nsis
+    arch: x64
+nsis:
+  artifactName: ${name}-v${version}-win-setup.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+mac:
+  target:
+    - target: dmg
+      arch: x64
+    - target: dmg
+      arch: arm64
+  hardenedRuntime: true
+  gatekeeperAssess: true
+dmg:
+  artifactName: ${name}-v${version}-mac-${arch}.${ext}
+linux:
+  target:
+    - target: AppImage
+      arch: x64
+  maintainer: Satoshi SAKAO
+  category: Utility
+appImage:
+  artifactName: ${name}-v${version}-linux.${ext}
+npmRebuild: false

@@ -1,4 +1,4 @@
-import { ipcRenderer } from 'electron'
+import { ipcRenderer, webUtils } from 'electron'
 
 window.onload = () => {
   document.body.style.height = '100vh'
@@ -12,8 +12,8 @@ window.onload = () => {
 
     // notify dropped file to host window
     if (e.dataTransfer.files.length > 0) {
-      const filePath = e.dataTransfer.files[0].path
-      ipcRenderer.sendToHost('ondropfile', filePath)
+      const file = e.dataTransfer.files[0]
+      ipcRenderer.send('openFile', webUtils.getPathForFile(file))
     }
   }
 }

@@ -1,7 +1,8 @@
-const { contextBridge, ipcRenderer } = require('electron')
+const { contextBridge, ipcRenderer, webUtils } = require('electron')
 
 contextBridge.exposeInMainWorld('api', {
-  openFile: (filePath) => ipcRenderer.send('openFile', filePath),
+  openFile: (file) => ipcRenderer.send('openFile', webUtils.getPathForFile(file)),
+  showOpenDialog: () => ipcRenderer.send('showOpenDialog'),
   rebuild: () => ipcRenderer.send('rebuild'),
   save: () => ipcRenderer.send('save'),
   openInitialFile: () => ipcRenderer.send('openInitialFile'),
