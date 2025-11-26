@@ -22,7 +22,7 @@ jobs:
         run: yarn
 
       - name: Build binary for mac
-        run: yarn electron:build:mac
+        run: yarn electron:build:mac -- --publish=never
         env:
           CSC_LINK: ${{ secrets.CSC_LINK }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -30,10 +30,10 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       - name: Build binary for win
-        run: yarn electron:build:win
+        run: yarn electron:build:win -- --publish=never
 
       - name: Build binary for linux
-        run: yarn electron:build:linux
+        run: yarn electron:build:linux -- --publish=never
 
       - name: Create Release
         id: create_release
