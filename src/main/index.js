@@ -1,14 +1,13 @@
 import {
   app, protocol, BrowserWindow, Menu, ipcMain, dialog, shell,
 } from 'electron'
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import path from 'path'
 import minimist from 'minimist'
 import menuTemplate from './menu-template'
 import BuilderApp from './builder-app'
 
-const isDevelopment = process.env.NODE_ENV !== 'production'
+const isDevelopment = process.env.NODE_ENV === 'development'
 const args = minimist(process.argv.slice(isDevelopment ? 2 : 1))
 
 // Scheme must be registered before the app is ready
@@ -33,18 +32,17 @@ function createWindow(filePath) {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       contextIsolation: true,
       webviewTag: true,
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, '../preload/index.js'),
     },
   })
 
-  if (process.env.WEBPACK_DEV_SERVER_URL) {
+  if (!app.isPackaged && process.env.ELECTRON_RENDERER_URL) {
     // Load the url of the dev server if in development mode
-    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
+    win.loadURL(process.env.ELECTRON_RENDERER_URL)
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
-    createProtocol('app')
     // Load the index.html when not in development
-    win.loadURL('app://./index.html')
+    win.loadFile(path.join(__dirname, '../renderer/index.html'))
   }
 
   // open link in system browser
@@ -103,11 +101,12 @@ async function showOpenDialog(win) {
 function bindIpc() {
   ipcMain.on('openFile', (event, filePath) => {
     const win = BrowserWindow.fromWebContents(event.sender)
-    if (filePath) {
-      openFile(win, filePath)
-    } else {
-      showOpenDialog(win)
-    }
+    openFile(win, filePath)
+  })
+
+  ipcMain.on('showOpenDialog', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    showOpenDialog(win)
   })
 
   ipcMain.on('rebuild', (event) => {
@@ -142,8 +141,8 @@ function bindIpc() {
     }
   })
 
-  ipcMain.handle('isDebug', () => process.env.WEBPACK_DEV_SERVER_URL && !process.env.IS_TEST)
-  ipcMain.handle('contentViewPreloadPath', () => `${path.join(__dirname, 'preload-webview.js')}`)
+  ipcMain.handle('isDebug', () => process.env.ELECTRON_RENDERER_URL && !process.env.IS_TEST)
+  ipcMain.handle('contentViewPreloadPath', () => `${path.join(__dirname, '..', 'preload', 'preload-webview.js')}`)
 }
 
 app.on('second-instance', (event, commandLine) => {

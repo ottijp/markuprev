@@ -16,36 +16,28 @@ v-app
                   v-btn(@click="openDialog" color="primary" x-large) or Open in dialog
 
   template(v-else)
-    v-app-bar(app dense dark)
+    v-app-bar(app dense theme="dark")
       v-btn(@click="openDialog" :disabled="!isOpenDiableEnalbed") Open
       v-spacer
       div(v-if="isDebug")
-        v-tooltip(bottom)
-          template(v-slot:activator="{ on, attrs }")
-            v-btn(icon @click="toggleDevTools" v-bind="attrs" v-on="on")
-              v-icon mdi-information
-          span Toggle DevTools
-        v-tooltip(bottom)
-          template(v-slot:activator="{ on, attrs }")
-            v-btn(icon @click="toggleContentViewDevTools" v-bind="attrs" v-on="on")
-              v-icon mdi-information
-          span Toggle ContentView DevTools
+        v-btn(icon @click="toggleDevTools")
+          v-icon mdi-information
+          v-tooltip(location="bottom" activator="parent") Toggle DevTools
+        v-btn(icon @click="toggleContentViewDevTools")
+          v-icon mdi-information
+          v-tooltip(location="bottom" activator="parent") Toggle ContentView DevTools
       v-btn-toggle.mx-5
         v-btn(icon @click="zoomOut" :disabled="!isZoomOutEnalbed")
           v-icon mdi-minus
         v-btn(@click="zoom100" :disabled="!isZoom100Enabled" width="75") {{ zoomFactorPercent }}%
         v-btn(icon @click="zoomIn" :disabled="!isZoomInEnalbed")
           v-icon mdi-plus
-      v-tooltip(bottom)
-        template(v-slot:activator="{ on, attrs }")
-          v-btn(icon @click="rebuild" :disabled="!isBuildEnabled" v-bind="attrs" v-on="on")
-            v-icon mdi-reload
-        span Rebuild
-      v-tooltip(bottom)
-        template(v-slot:activator="{ on, attrs }")
-          v-btn(icon @click="save" :disabled="!isSaveEnabled" v-bind="attrs" v-on="on")
-            v-icon mdi-export
-        span Save HTML
+      v-btn(icon @click="rebuild" :disabled="!isBuildEnabled")
+        v-icon mdi-reload
+        v-tooltip(location="bottom" activator="parent") Rebuild
+      v-btn(icon @click="save" :disabled="!isSaveEnabled")
+        v-icon mdi-export
+        v-tooltip(location="bottom" activator="parent") Save HTML
     // workaround: v-main won't be resized depend on the height of v-footer. (bug?)
     // so, I didn't applied `app` attribute on v-footer and applied `flex-grow` class on v-main.
     v-main(v-if="buildState === 'error'")
@@ -60,16 +52,13 @@ v-app
         :allowpopups="true"
         :src="contentUrl"
         :preload="contentViewPreloadUrl"
-        @did-attach="contentViewDidAttach"
         @dom-ready="contentViewDomReady"
         )
 
-    v-footer.d-flex.flex-nowrap
-      v-tooltip(top)
-        template(v-slot:activator="{ on, attrs }")
-          v-btn(icon small @click="toggleHideFilePath" v-bind="attrs" v-on="on").mx-1.flex-shrink-0
-            v-icon {{ toggleHideFilePathIcon }}
-        span-path {{ toggleHideFilePathToolTip }}
+    v-footer.d-flex.flex-nowrap.flex-shrink-1.flex-grow-0
+      v-btn(icon small @click="toggleHideFilePath").mx-1.flex-shrink-0
+        v-icon {{ toggleHideFilePathIcon }}
+        v-tooltip(location="top" activator="parent") {{ toggleHideFilePathToolTip }}
       span(v-if="!isHideFilePath").mx-1.flex-grow-1.text-caption.file-path {{ filePath }}
       span(v-else).flex-grow-1
       v-progress-circular(v-if="buildState === 'building'", indeterminate, size="20"
@@ -109,11 +98,11 @@ export default {
       e.preventDefault()
     }
 
-    document.ondrop = (e) => {
+    document.ondrop = async (e) => {
       e.preventDefault()
       if (e.dataTransfer.files.length > 0) {
-        const filePath = e.dataTransfer.files[0].path
-        window.api.openFile(filePath)
+        const file = e.dataTransfer.files[0]
+        window.api.openFile(file)
       }
     }
 
@@ -161,7 +150,7 @@ export default {
 
   methods: {
     async openDialog() {
-      window.api.openFile()
+      window.api.showOpenDialog()
     },
 
     toggleDevTools() {
@@ -186,16 +175,6 @@ export default {
 
     getContentView() {
       return document.getElementById('previewContent')
-    },
-
-    contentViewDidAttach(event) {
-      // listen drop event from guest webview
-      event.target.addEventListener('ipc-message', e => {
-        if (e.channel === 'ondropfile') {
-          const filePath = e.args[0]
-          window.api.openFile(filePath)
-        }
-      })
     },
 
     contentViewDomReady() {
