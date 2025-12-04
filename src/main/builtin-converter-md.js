@@ -9,6 +9,10 @@ const md = require('markdown-it')({
 })
   .use(checkbox)
 
+md.linkify
+  .set({ fuzzyLink: false })
+  .add('ftp:', null)
+
 export default class BuiltinConverterMd {
   // ignore because this method is protocol
   async convert(file) {
