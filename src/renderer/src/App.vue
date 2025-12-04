@@ -140,6 +140,7 @@ export default {
     })
 
     window.api.onSaved(() => {
+      this.buildState = 'ready'
     })
 
     this.isDebug = await window.api.isDebug()
